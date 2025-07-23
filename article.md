@@ -12,7 +12,7 @@ Embulkを触って最初に思ったのは「これ、どこで動かそうか�
 
 本記事で解説するコード一式は、以下のGitHubリポジトリで公開しています：
 
-**🔗 [embulk-lambda-container](https://github.com/konan0802/bidata-embulk)**
+**🔗 [bidata-embulk](https://github.com/konan0802/bidata-embulk)**
 
 - 完全なDockerfile（マルチステージビルド）
 - Lambda ハンドラの実装例  
@@ -22,7 +22,7 @@ Embulkを触って最初に思ったのは「これ、どこで動かそうか�
 記事と合わせてご活用ください。
 
 ## ディレクトリ構成
-embulk-lambda-container/
+bidata-embulk/
 ├── Dockerfile
 ├── embulk.properties
 ├── config/
@@ -49,7 +49,7 @@ Embulk は Java 製で **JAR が 100 MB を超え**、利用するプラグイ�
 
 ```mermaid
 flowchart TD
-  EB(EventBridge ルール) -->|Invoke| L(Lambda: embulk-lambda-container)
+  EB(EventBridge ルール) -->|Invoke| L(Lambda: bidata-embulk)
   L --> RS[(Redshift)]
   L --> S3[(S3  一時領域)]
   L --> DB[(各種 DB / MongoDB)]
@@ -148,10 +148,10 @@ cp .env.sample .env
 # .envファイルを編集してDB接続情報を設定
 
 # 2. イメージビルド
-docker build -t embulk-lambda-container .
+docker build -t bidata-embulk .
 
 # 3. 実行テスト
-docker run --rm --env-file .env --entrypoint python embulk-lambda-container \
+docker run --rm --env-file .env --entrypoint python bidata-embulk \
   main.py '{"config_file_name":"config_users.yml.liquid"}'
 ```
 
@@ -160,7 +160,7 @@ docker run --rm --env-file .env --entrypoint python embulk-lambda-container \
 ```bash
 # ECRにプッシュ後、Lambda関数で「新しいイメージをデプロイ」するだけ
 aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URL
-docker push $ECR_URL/embulk-lambda-container:latest
+docker push $ECR_URL/bidata-embulk:latest
 ```
 
 ## ARM64 (Apple Silicon) での注意
