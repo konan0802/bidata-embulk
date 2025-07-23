@@ -12,7 +12,7 @@ Embulkを触って最初に思ったのは「これ、どこで動かそうか�
 
 本記事で解説するコード一式は、以下のGitHubリポジトリで公開しています：
 
-**🔗 [embulk-lambda-container](https://github.com/your-username/embulk-lambda-container)**
+**🔗 [embulk-lambda-container](https://github.com/konan0802/bidata-embulk)**
 
 - 完全なDockerfile（マルチステージビルド）
 - Lambda ハンドラの実装例  
@@ -81,7 +81,7 @@ COPY src/main.py /var/task/
 CMD [ "main.lambda_handler" ]
 ```
 
-> 📄 **完全なDockerfile**: [リポジトリで確認](https://github.com/your-username/embulk-lambda-container/blob/main/Dockerfile)
+> 📄 **完全なDockerfile**: [リポジトリで確認](https://github.com/konan0802/bidata-embulk/blob/main/Dockerfile)
 
 ### 🔑 設計のポイント
 
@@ -110,7 +110,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     return {"statusCode": 200}
 ```
 
-> 📄 **完全な実装**: [main.py](https://github.com/your-username/embulk-lambda-container/blob/main/src/main.py)
+> 📄 **完全な実装**: [main.py](https://github.com/konan0802/bidata-embulk/blob/main/src/main.py)
 
 ### 🚀 パフォーマンス最適化のポイント
 
