@@ -1,0 +1,50 @@
+in:
+  type: mysql
+  host: {{ env.MYSQL_HOST }}
+  port: {{ env.MYSQL_PORT }}
+  user: {{ env.MYSQL_USER }}
+  password: {{ env.MYSQL_PASSWORD }}
+  database: {{ env.MYSQL_DB }}
+  table: orders
+  select: "id, user_id, total_amount, status, payment_method, created_at, updated_at"
+  where: "created_at >= CURDATE() - INTERVAL 1 DAY"
+  options: { 
+    serverTimezone: 'UTC',
+    useSSL: false,
+    useCursorFetch: true,
+    connectTimeout: 60000,
+    socketTimeout: 60000,
+    useCompression: false
+  }
+
+filters:
+  - type: typecast
+    columns:
+      - {name: id, type: long}
+      - {name: user_id, type: long}
+      - {name: total_amount, type: double}
+      - {name: status, type: string}
+      - {name: payment_method, type: string}
+      - {name: created_at, type: timestamp, format: "%Y-%m-%d %H:%M:%S"}
+      - {name: updated_at, type: timestamp, format: "%Y-%m-%d %H:%M:%S"}
+
+out:
+  type: redshift
+  host: {{ env.REDSHIFT_HOST }}
+  user: {{ env.REDSHIFT_USER }}
+  password: {{ env.REDSHIFT_PASSWORD }}
+  database: {{ env.REDSHIFT_DB }}
+  schema: {{ env.REDSHIFT_SCHEMA }}
+  table: orders
+  aws_auth_method: env
+  s3_bucket: {{ env.S3_BUCKET }}
+  s3_key_prefix: data/orders
+  copy_iam_role_name: {{ env.REDSHIFT_COPY_IAM_ROLE_NAME }}
+  mode: merge
+  merge: [id]
+
+{% comment %}
+Usage:
+docker run --rm --env-file .env --entrypoint python embulk-lambda-container \
+  main.py '{"config_file_name":"config_orders.yml.liquid"}'
+{% endcomment %} 

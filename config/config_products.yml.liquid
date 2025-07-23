@@ -1,0 +1,61 @@
+in:
+  type: mongodb
+  hosts:
+    - {host: {{ env.MONGODB_HOST }}, port: {{ env.MONGODB_PORT }}}
+  user: {{ env.MONGODB_USER }}
+  password: {{ env.MONGODB_PASSWORD }}
+  database: {{ env.MONGODB_DB }}
+  collection: products
+  query: |
+    {
+      "updated_at": {
+        "$gte": {
+          "$date": {
+            "$dateSubtract": {
+              "startDate": "$$NOW",
+              "unit": "day",
+              "amount": 7
+            }
+          }
+        }
+      }
+    }
+
+filters:
+  - type: expand_json
+    json_column_name: record
+    expanded_columns:
+      - {name: _id, type: string}
+      - {name: name, type: string}
+      - {name: description, type: string}
+      - {name: price, type: double}
+      - {name: category_id, type: long}
+      - {name: stock_quantity, type: long}
+      - {name: created_at, type: string}
+      - {name: updated_at, type: string}
+      - {name: status, type: string}
+  - type: typecast
+    columns:
+      - {name: created_at, type: timestamp, format: "%Y-%m-%d %H:%M:%S"}
+      - {name: updated_at, type: timestamp, format: "%Y-%m-%d %H:%M:%S"}
+
+out:
+  type: redshift
+  host: {{ env.REDSHIFT_HOST }}
+  user: {{ env.REDSHIFT_USER }}
+  password: {{ env.REDSHIFT_PASSWORD }}
+  database: {{ env.REDSHIFT_DB }}
+  schema: {{ env.REDSHIFT_SCHEMA }}
+  table: products
+  aws_auth_method: env
+  s3_bucket: {{ env.S3_BUCKET }}
+  s3_key_prefix: data/products
+  copy_iam_role_name: {{ env.REDSHIFT_COPY_IAM_ROLE_NAME }}
+  mode: merge
+  merge: [_id]
+
+{% comment %}
+Usage:
+docker run --rm --env-file .env --entrypoint python embulk-lambda-container \
+  main.py '{"config_file_name":"config_products.yml.liquid"}'
+{% endcomment %} 

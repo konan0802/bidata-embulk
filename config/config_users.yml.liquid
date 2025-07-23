@@ -1,0 +1,48 @@
+in:
+  type: postgresql
+  host: {{ env.DB_HOST }}
+  port: {{ env.DB_PORT }}
+  user: {{ env.DB_USER }}
+  password: {{ env.DB_PASSWORD }}
+  database: {{ env.DB_NAME }}
+  table: users
+  select: "id, username, email, created_at, updated_at, status"
+  where: "created_at >= CURRENT_DATE - INTERVAL '7 days'"
+  options: { 
+    serverTimezone: 'UTC',
+    useSSL: false,
+    useCursorFetch: true,
+    connectTimeout: 60000,
+    socketTimeout: 60000
+  }
+
+filters:
+  - type: typecast
+    columns:
+      - {name: id, type: long}
+      - {name: username, type: string}
+      - {name: email, type: string}
+      - {name: created_at, type: timestamp, format: "%Y-%m-%d %H:%M:%S"}
+      - {name: updated_at, type: timestamp, format: "%Y-%m-%d %H:%M:%S"}
+      - {name: status, type: string}
+
+out:
+  type: redshift
+  host: {{ env.REDSHIFT_HOST }}
+  user: {{ env.REDSHIFT_USER }}
+  password: {{ env.REDSHIFT_PASSWORD }}
+  database: {{ env.REDSHIFT_DB }}
+  schema: {{ env.REDSHIFT_SCHEMA }}
+  table: users
+  aws_auth_method: env
+  s3_bucket: {{ env.S3_BUCKET }}
+  s3_key_prefix: data/users
+  copy_iam_role_name: {{ env.REDSHIFT_COPY_IAM_ROLE_NAME }}
+  mode: merge
+  merge: [id]
+
+{% comment %}
+Usage:
+docker run --rm --env-file .env --entrypoint python embulk-lambda-container \
+  main.py '{"config_file_name":"config_users.yml.liquid"}'
+{% endcomment %} 

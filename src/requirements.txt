@@ -1,0 +1,11 @@
+# AWS Lambda用のPythonランタイム依存関係
+# AWS SDK for Python (boto3) - Parameter Store等のAWSサービスにアクセスする場合
+boto3>=1.26.0
+
+# 環境変数を.envファイルから読み込むため
+python-dotenv>=1.0.0
+
+# AWS Lambda用のPythonランタイム（Lambda環境では自動的に利用可能）
+# awslambdaric>=2.0.0  # Lambda環境では不要
+
+# 標準ライブラリを使用しているため、他の依存関係は不要 
