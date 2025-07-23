@@ -4,7 +4,7 @@ Embulkをコンテナイメージとして動作させるAWS Lambdaの構成例�
 
 Docker × Lambda でEmbulkを動作させることで、サーバーレスでスケーラブルなデータパイプラインを構築できます。
 
-> **📝 詳細な解説記事**: [EmbulkをDocker×Lambdaで動かす（開発＆本番環境）](./article.md)  
+> **📝 詳細な解説記事**: [EmbulkをDocker×Lambdaで動かす（開発＆本番環境）](https://zenn.dev/konan/articles/653381379e846f)  
 > このREADMEと合わせてお読みください。
 
 ## 特徴
