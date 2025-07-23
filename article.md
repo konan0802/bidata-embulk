@@ -12,7 +12,7 @@ Embulkを触って最初に思ったのは「これ、どこで動かそうか�
 
 本記事で解説するコード一式は、以下のGitHubリポジトリで公開しています：
 
-**🔗 [bidata-embulk](https://github.com/konan0802/bidata-embulk)**
+**🔗 [embulk-lambda-container](https://github.com/konan0802/embulk-lambda-container)**
 
 - 完全なDockerfile（マルチステージビルド）
 - Lambda ハンドラの実装例  
@@ -22,7 +22,7 @@ Embulkを触って最初に思ったのは「これ、どこで動かそうか�
 記事と合わせてご活用ください。
 
 ## ディレクトリ構成
-bidata-embulk/
+embulk-lambda-container/
 ├── Dockerfile
 ├── embulk.properties
 ├── config/
@@ -49,7 +49,7 @@ Embulk は Java 製で **JAR が 100 MB を超え**、利用するプラグイ�
 
 ```mermaid
 flowchart TD
-  EB(EventBridge ルール) -->|Invoke| L(Lambda: bidata-embulk)
+  EB(EventBridge ルール) -->|Invoke| L(Lambda: embulk-lambda-container)
   L --> RS[(Redshift)]
   L --> S3[(S3  一時領域)]
   L --> DB[(各種 DB / MongoDB)]
@@ -81,7 +81,7 @@ COPY src/main.py /var/task/
 CMD [ "main.lambda_handler" ]
 ```
 
-> 📄 **完全なDockerfile**: [リポジトリで確認](https://github.com/konan0802/bidata-embulk/blob/main/Dockerfile)
+> 📄 **完全なDockerfile**: [リポジトリで確認](https://github.com/konan0802/embulk-lambda-container/blob/main/Dockerfile)
 
 ### 🔑 設計のポイント
 
@@ -110,7 +110,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     return {"statusCode": 200}
 ```
 
-> 📄 **完全な実装**: [main.py](https://github.com/konan0802/bidata-embulk/blob/main/src/main.py)
+> 📄 **完全な実装**: [main.py](https://github.com/konan0802/embulk-lambda-container/blob/main/src/main.py)
 
 ### 🚀 パフォーマンス最適化のポイント
 
@@ -148,10 +148,10 @@ cp .env.sample .env
 # .envファイルを編集してDB接続情報を設定
 
 # 2. イメージビルド
-docker build -t bidata-embulk .
+docker build -t embulk-lambda-container .
 
 # 3. 実行テスト
-docker run --rm --env-file .env --entrypoint python bidata-embulk \
+docker run --rm --env-file .env --entrypoint python embulk-lambda-container \
   main.py '{"config_file_name":"config_users.yml.liquid"}'
 ```
 
@@ -160,7 +160,7 @@ docker run --rm --env-file .env --entrypoint python bidata-embulk \
 ```bash
 # ECRにプッシュ後、Lambda関数で「新しいイメージをデプロイ」するだけ
 aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URL
-docker push $ECR_URL/bidata-embulk:latest
+docker push $ECR_URL/embulk-lambda-container:latest
 ```
 
 ## ARM64 (Apple Silicon) での注意
